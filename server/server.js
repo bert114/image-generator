@@ -8,7 +8,7 @@ dotenv.config();
 
 const app = express();
 app.use(cors());
-app.use(express.json()); // IMPORTANT: parse JSON bodies
+app.use(express.json()); 
 
 const upload = multer({ dest: "uploads/" });
 
