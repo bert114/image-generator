@@ -22,10 +22,10 @@ function buildPrompt({ prompt, textMode }) {
   // Keep it simple, high-contrast, “exact text” rules
   return `${prompt}
 
-Create a clean poster/sign with HIGH-CONTRAST, READABLE TYPOGRAPHY.
-If the prompt includes words that must appear in the image, render them EXACTLY (no misspellings).
-Use simple sans-serif font, large letters, centered layout, plain background behind text.
-NO extra words, NO watermarks, NO random small print.`;
+  Create a clean poster/sign with HIGH-CONTRAST, READABLE TYPOGRAPHY.
+  If the prompt includes words that must appear in the image, render them EXACTLY (no misspellings).
+  Use simple sans-serif font, large letters, centered layout, plain background behind text.
+  NO extra words, NO watermarks, NO random small print.`;
 }
 
 app.post("/generate", upload.single("image"), async (req, res) => {

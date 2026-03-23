@@ -1,0 +1,110 @@
+PROJECT GOAL & BEST PRACTICES (LLM BRIEF)
+
+WHAT I’M BUILDING
+- A web-based image generator:
+  - Frontend: React + Vite UI
+  - Backend: Node/Express API
+  - Provider: Infip Images API (https://api.infip.pro/v1/images/generations)
+- Primary use cases: all styles (photo, illustration, product, cinematic)
+- Special requirements: consistent identity + high text-in-image accuracy
+
+CORE REQUIREMENTS (MUST-HAVES)
+1) API-only (no self-hosted GPU)
+2) Return 1 final image to the user (for now)
+3) Text in image must be accurate (logos, posters, labels, signage)
+4) Identity consistency: same character/person should look consistent across generations
+
+CONSTRAINTS & REALITIES
+- Even strong models sometimes misspell or distort text.
+- Consistent identity is hard with pure text-to-image unless:
+  - reference images (img2img / guidance) are supported, or
+  - editing workflow exists, or
+  - post-processing is used for typography.
+
+RECOMMENDED APPROACH (BEST-PRACTICE PIPELINE)
+
+A) PROMPT FORMATTING / REFINEMENT (CRITICAL)
+- Convert user input into structured fields:
+  - subject, environment, style, composition, lighting, camera/medium, mood, color palette, constraints
+- If user includes text, extract:
+  - exact_text (must match exactly)
+  - placement (top center / signboard / label area)
+  - font_style (sans / serif / handwritten / brand-like)
+  - contrast (dark text on light background, etc.)
+- If we will overlay text ourselves:
+  - instruct the model to “leave space for text”
+  - instruct the model to NOT include any letters/words
+
+B) GENERATE IMAGE
+- Prefer Infip free models in this order:
+  - default: img4 (fallback to img3)
+  - optional: sdxl / flux variants / qwen depending on style needs
+- Pass consistent parameters when supported:
+  - seed, size/aspect ratio, quality, n
+
+C) ENFORCE TEXT ACCURACY (RECOMMENDED)
+For guaranteed correctness:
+- Generate the image WITHOUT embedded text (or with a blank text area).
+- Programmatically overlay the exact text server-side (Sharp/Canvas).
+This ensures 100% spelling accuracy.
+
+D) IDENTITY CONSISTENCY
+- If provider supports reference guidance:
+  - accept a reference image upload and pass it to the API (img2img / reference)
+- If provider does NOT support identity locking:
+  - use a “character sheet prompt” template:
+  - stable physical description, stable outfit, stable framing, stable style keywords
+  - reuse seed when supported
+  - optional: generate 2 candidates internally, pick best, still return 1 to user
+
+E) QUALITY CONTROLS
+- Add guardrails:
+  - reject empty prompts, normalize aspect ratio/size, limit prompt length
+- Add retry logic for provider errors/timeouts
+
+PROMPT TEMPLATES (COPY/PASTE)
+
+1) GENERAL HIGH-QUALITY PROMPT
+User intent: {user_prompt}
+Output style: {style_preset}
+Subject: {subject}
+Scene: {environment}
+Composition: {composition}
+Lighting: {lighting}
+Details: ultra-detailed, sharp focus, clean composition, no artifacts
+Constraints: no distorted anatomy, no unreadable elements, no extra limbs, no random text
+
+2) TEXT-CRITICAL PROMPT (LEAVE SPACE; OVERLAY TEXT LATER)
+Create an image with a clear blank space reserved for text.
+- Subject: {subject}
+- Scene: {environment}
+- Style: {style}
+- Composition: include an empty area at {placement} with a clean, high-contrast background suitable for text
+Do NOT include any letters or words in the image.
+
+(We will overlay this exact text later): {exact_text}
+
+3) IDENTITY CONSISTENCY “CHARACTER SHEET” (PREPEND THIS)
+The main subject is the SAME PERSON across images:
+- Face: {stable_face_description}
+- Hair: {stable_hair}
+- Clothing: {stable_outfit}
+- Accessories: {stable_accessories}
+- Age/ethnicity/style: {stable_traits}
+Keep these identity traits consistent.
+
+IMPLEMENTATION CHECKLIST
+- Move API key to env vars (process.env.INFIP_API_KEY)
+- Default model to img4 (fallback to img3)
+- Add API params: model, size/aspect_ratio, seed, n
+- Add server-side text overlay option (Sharp recommended) for exact typography
+- Add logging (request id, model, latency, errors)
+- Add rate limiting + basic validation
+- Optional later: store images in object storage (S3/R2)
+
+WHAT I WANT FROM AN ASSISTANT/LLM
+- Prefer minimal changes that improve image quality and consistency
+- Stay API-only
+- Prioritize text accuracy (suggest overlay if needed)
+- Use Infip models and best practices; propose safe fallbacks
+- Provide concrete code edits for Node/Express + React

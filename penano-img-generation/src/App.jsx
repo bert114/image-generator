@@ -23,6 +23,11 @@ import {
 } from "lucide-react";
 import "./scss/main.scss";
 import HomePage from "./components/Homepage";
+import ModelSelector from "./components/ModelSelector";
+import DesignQuestions from "./components/DesignQuestions";
+import UploadReference from "./components/UploadReference";
+import ResultGallery from "./components/ResultGallery";
+import GenerateButton from "./components/GenerateButton";
 
 const styleModes = [
   {
@@ -143,5 +148,33 @@ function ActionButton({ icon: Icon, label }) {
 }
 
 export default function App() {
-  return <HomePage />;
+  const [prompt, setPrompt] = useState("");
+  const [model, setModel] = useState("img4");
+  const [image, setImage] = useState(null);
+  const [result, setResult] = useState([]);
+
+  const [textMode, setTextMode] = useState(false);
+  const [size, setSize] = useState("1024x1024");
+  
+
+  return (
+    
+    <div>
+      <ModelSelector model={model} setModel={setModel} />
+      <DesignQuestions prompt={prompt} setPrompt={setPrompt} />
+      <UploadReference setImage={setImage} />
+
+      {/* ✅ PUT IT HERE: wherever your “Generate” button should appear */}
+      <GenerateButton
+        image={image}
+        prompt={prompt}
+        model={model}
+        setResult={setResult}
+        textMode={textMode}
+        size={size}
+      />
+
+      <ResultGallery result={result} />
+    </div>
+  );
 }

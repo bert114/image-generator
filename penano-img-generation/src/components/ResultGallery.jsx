@@ -1,10 +1,10 @@
-export default function ResultGallery({ results }) {
+export default function ResultGallery({ result = [] }) {
+  if (!Array.isArray(result) || result.length === 0) return null;
+
   return (
     <div>
-      <h2>Generated Designs</h2>
-
-      {results.map((img, i) => (
-        <img key={i} src={img} width="250" />
+      {result.map((imgUrl, idx) => (
+        <img key={idx} src={imgUrl} alt={`Generated ${idx}`} />
       ))}
     </div>
   );
