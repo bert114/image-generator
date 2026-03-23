@@ -164,6 +164,31 @@ export default function App() {
       <DesignQuestions prompt={prompt} setPrompt={setPrompt} />
       <UploadReference setImage={setImage} />
 
+
+      <div style={{ margin: "12px 0" }}>
+      <label style={{ display: "block", marginBottom: 8 }}>
+        <input
+          type="checkbox"
+          checked={textMode}
+          onChange={(e) => {
+            const on = e.target.checked;
+            setTextMode(on);
+            if (on) setSize("1792x1024");
+          }}
+        />{" "}
+        Text accuracy mode (better text-in-image)
+      </label>
+
+      <label style={{ display: "block" }}>
+        Size:{" "}
+        <select value={size} onChange={(e) => setSize(e.target.value)}>
+          <option value="1024x1024">1024×1024 (square)</option>
+          <option value="1792x1024">1792×1024 (wide)</option>
+          <option value="1024x1792">1024×1792 (tall)</option>
+        </select>
+      </label>
+    </div>
+
       {/* ✅ PUT IT HERE: wherever your “Generate” button should appear */}
       <GenerateButton
         image={image}
